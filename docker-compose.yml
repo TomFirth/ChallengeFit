@@ -1,0 +1,25 @@
+services:
+  server:
+    build: ./server
+    ports:
+      - "8443:8443"
+    environment:
+      - PORT=8443
+      - DATABASE_URL=postgresql://user:password@db:5432/fitnessquest
+      - NODE_ENV=production
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fitnessquest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

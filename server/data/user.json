@@ -1,0 +1,16 @@
+{
+  "id": "u1",
+  "username": "Tom",
+  "availability": [
+    {
+      "day": "Everyday",
+      "startTime": "09:00",
+      "endTime": "18:00"
+    }
+  ],
+  "currentLevel": 0,
+  "totalXP": 0,
+  "currentStreak": 0,
+  "bestStreak": 0,
+  "daysActive": 0
+}

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "m-1785517382719-0",
+    "userId": "u1",
+    "exerciseId": "lunges",
+    "scheduledTime": "2026-07-31T10:47:00.000Z",
+    "status": "MISSED",
+    "snoozeCount": 0,
+    "bracket": {
+      "start": "09:00",
+      "end": "12:00"
+    },
+    "createdAt": "2026-07-31T17:03:02.719Z"
+  },
+  {
+    "id": "m-1785517382719-1",
+    "userId": "u1",
+    "exerciseId": "mountain-climbers",
+    "scheduledTime": "2026-07-31T12:52:00.000Z",
+    "status": "MISSED",
+    "snoozeCount": 0,
+    "bracket": {
+      "start": "12:00",
+      "end": "15:00"
+    },
+    "createdAt": "2026-07-31T17:03:02.719Z"
+  },
+  {
+    "id": "m-1785517382719-2",
+    "userId": "u1",
+    "exerciseId": "sit-ups",
+    "scheduledTime": "2026-07-31T14:08:00.000Z",
+    "status": "MISSED",
+    "snoozeCount": 0,
+    "bracket": {
+      "start": "15:00",
+      "end": "18:00"
+    },
+    "createdAt": "2026-07-31T17:03:02.719Z"
+  }
+]

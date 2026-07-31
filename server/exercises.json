@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "exercises": [
+    {
+      "id": "push-ups",
+      "name": "Push Ups",
+      "category": "strength",
+      "muscleGroups": [
+        "chest",
+        "shoulders",
+        "triceps"
+      ],
+      "difficulty": {
+        "beginner": {
+          "reps": 5
+        },
+        "normal": {
+          "reps": 15
+        },
+        "advanced": {
+          "reps": 30
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 60,
+      "caloriesEstimate": 8,
+      "instructions": [
+        "Place hands shoulder width apart",
+        "Lower chest towards the floor",
+        "Push back up while keeping your body straight"
+      ],
+      "tags": [
+        "upper-body",
+        "quick",
+        "home"
+      ]
+    },
+    {
+      "id": "bodyweight-squats",
+      "name": "Bodyweight Squats",
+      "category": "strength",
+      "muscleGroups": [
+        "legs",
+        "glutes"
+      ],
+      "difficulty": {
+        "beginner": {
+          "reps": 10
+        },
+        "normal": {
+          "reps": 20
+        },
+        "advanced": {
+          "reps": 50
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 90,
+      "caloriesEstimate": 12,
+      "instructions": [
+        "Stand with feet shoulder width apart",
+        "Lower hips backwards",
+        "Return to standing position"
+      ],
+      "tags": [
+        "lower-body",
+        "quick",
+        "home"
+      ]
+    },
+    {
+      "id": "plank",
+      "name": "Plank",
+      "category": "core",
+      "muscleGroups": [
+        "core",
+        "shoulders"
+      ],
+      "difficulty": {
+        "beginner": {
+          "seconds": 20
+        },
+        "normal": {
+          "seconds": 45
+        },
+        "advanced": {
+          "seconds": 120
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 120,
+      "caloriesEstimate": 5,
+      "instructions": [
+        "Place forearms on the floor",
+        "Keep body straight",
+        "Hold position"
+      ],
+      "tags": [
+        "core",
+        "static",
+        "home"
+      ]
+    },
+    {
+      "id": "lunges",
+      "name": "Walking Lunges",
+      "category": "strength",
+      "muscleGroups": [
+        "legs",
+        "glutes"
+      ],
+      "difficulty": {
+        "beginner": {
+          "reps": 10
+        },
+        "normal": {
+          "reps": 20
+        },
+        "advanced": {
+          "reps": 40
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 120,
+      "caloriesEstimate": 15,
+      "instructions": [
+        "Step forward",
+        "Lower rear knee towards the floor",
+        "Return and repeat"
+      ],
+      "tags": [
+        "legs",
+        "balance",
+        "home"
+      ]
+    },
+    {
+      "id": "jumping-jacks",
+      "name": "Jumping Jacks",
+      "category": "cardio",
+      "muscleGroups": [
+        "full-body"
+      ],
+      "difficulty": {
+        "beginner": {
+          "seconds": 30
+        },
+        "normal": {
+          "seconds": 60
+        },
+        "advanced": {
+          "seconds": 120
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 120,
+      "caloriesEstimate": 15,
+      "instructions": [
+        "Jump while spreading arms and legs",
+        "Return to starting position",
+        "Repeat continuously"
+      ],
+      "tags": [
+        "cardio",
+        "warmup",
+        "high-energy"
+      ]
+    },
+    {
+      "id": "burpees",
+      "name": "Burpees",
+      "category": "cardio",
+      "muscleGroups": [
+        "full-body"
+      ],
+      "difficulty": {
+        "beginner": {
+          "reps": 5
+        },
+        "normal": {
+          "reps": 10
+        },
+        "advanced": {
+          "reps": 25
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 120,
+      "caloriesEstimate": 25,
+      "instructions": [
+        "Squat down",
+        "Place hands on floor",
+        "Kick feet back",
+        "Return and jump"
+      ],
+      "tags": [
+        "cardio",
+        "hard",
+        "full-body"
+      ]
+    },
+    {
+      "id": "sit-ups",
+      "name": "Sit Ups",
+      "category": "core",
+      "muscleGroups": [
+        "abs"
+      ],
+      "difficulty": {
+        "beginner": {
+          "reps": 10
+        },
+        "normal": {
+          "reps": 25
+        },
+        "advanced": {
+          "reps": 50
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 90,
+      "caloriesEstimate": 10,
+      "instructions": [
+        "Lie on your back",
+        "Bend knees",
+        "Raise torso towards knees"
+      ],
+      "tags": [
+        "core",
+        "home"
+      ]
+    },
+    {
+      "id": "mountain-climbers",
+      "name": "Mountain Climbers",
+      "category": "cardio",
+      "muscleGroups": [
+        "core",
+        "legs",
+        "shoulders"
+      ],
+      "difficulty": {
+        "beginner": {
+          "seconds": 20
+        },
+        "normal": {
+          "seconds": 45
+        },
+        "advanced": {
+          "seconds": 90
+        }
+      },
+      "equipment": "none",
+      "durationSeconds": 90,
+      "caloriesEstimate": 15,
+      "instructions": [
+        "Start in push up position",
+        "Drive knees towards chest",
+        "Alternate legs quickly"
+      ],
+      "tags": [
+        "cardio",
+        "core",
+        "high-intensity"
+      ]
+    }
+  ]
+}
