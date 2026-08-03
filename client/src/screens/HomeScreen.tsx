@@ -1,63 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { Config } from '../constants/Config';
+import { styles } from '../styles/HomeScreenStyles';
 import { missionApi } from '../services/api';
 import { Mission } from '../types';
 import { useTheme } from '../hooks/useTheme';
 import { useData } from '../hooks/useData';
 import { movementService } from '../services/MovementService';
+import { healthService } from '../services/HealthService';
 import Toast from 'react-native-toast-message';
-import * as Notifications from 'expo-notifications';
-
-// Configure how notifications are handled when the app is foregrounded
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+import Constants from 'expo-constants';
 
 export default function HomeScreen() {
   const { colors } = useTheme();
   const { missions, userStats, allCompleted, refreshData, updateMissionStatus, setUserStats, setAllCompleted } = useData();
   const [flexMode, setFlexMode] = useState(false);
   const [movementState, setMovementState] = useState(movementService.getMovementState());
+  const [totalSteps, setTotalSteps] = useState(0);
 
   useEffect(() => {
-    const setupNotifications = async () => {
-      const { status } = await Notifications.getPermissionsAsync();
-      if (status !== 'granted') {
-        await Notifications.requestPermissionsAsync();
-      }
-    };
-
-    const scheduleMissions = async () => {
-      await Notifications.cancelAllScheduledNotificationsAsync();
-
-      const now = new Date();
-
-      missions.forEach(async (mission) => {
-        if (mission.status !== 'PENDING') return;
-
-        // Parse bracket start time (e.g., "09:00")
-        const [hours, minutes] = mission.bracket.start.split(':').map(Number);
-        const trigger = new Date();
-        trigger.setHours(hours || 0, minutes || 0, 0, 0);
-
-        // If the time has already passed today, don't schedule
-        if (trigger < now) return;
-
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: "Fitness Quest! 🎯",
-            body: `Time to do your ${mission.exerciseId.replace('-', ' ')}! 💪`,
-            data: { missionId: mission.id },
-          },
-          trigger,
-        });
-      });
-    };
-
     // Check for immediate toast if app is open
     const checkRequiredMissions = () => {
       const now = new Date();
@@ -77,13 +38,62 @@ export default function HomeScreen() {
       });
     };
 
-    setupNotifications();
-    scheduleMissions();
     refreshData();
+    healthService.getTodayTotalSteps().then(setTotalSteps);
 
-    const interval = setInterval(checkRequiredMissions, 60000);
+    const interval = setInterval(checkRequiredMissions, Config.CHECK_MISSIONS_INTERVAL);
     return () => clearInterval(interval);
   }, [missions]);
+
+  useEffect(() => {
+      const runCatchup = async () => {
+          if (missions.length === 0) return;
+
+          const steps = await healthService.getTodayTotalSteps();
+          setTotalSteps(steps);
+
+          // Tiered validation
+          const tiers = [Config.STEP_THRESHOLD_PER_MISSION, Config.STEP_THRESHOLD_PER_MISSION * 2, Config.DAILY_STEP_GOAL];
+          const pendingMissions = missions.filter(m => m.status !== 'COMPLETED').sort((a, b) => a.bracketStart.localeCompare(b.bracketStart));
+          const completedCount = missions.filter(m => m.status === 'COMPLETED').length;
+
+          for (let i = 0; i < pendingMissions.length; i++) {
+              const mission = pendingMissions[i];
+              const tierNeeded = tiers[completedCount + i];
+
+              if (steps >= tierNeeded) {
+                  try {
+                      await missionApi.validateMission(mission.id, Config.STEP_THRESHOLD_PER_MISSION);
+                      Toast.show({
+                          type: 'success',
+                          text1: 'Auto-Validated! 💪',
+                          text2: `Goal met: ${tierNeeded} steps!`,
+                      });
+                  } catch (e) {
+                      console.error('Catch-up validation failed', e);
+                  }
+              }
+          }
+          refreshData();
+      };
+
+      runCatchup();
+  }, [missions]);
+
+  const handleBonusMission = async () => {
+      try {
+          const response = await missionApi.getBonusMission();
+          await refreshData();
+          Toast.show({
+              type: 'success',
+              text1: 'Bonus Unlocked!',
+              text2: 'A special extra challenge just for you! 🎯',
+          });
+      } catch (error: any) {
+          const msg = error.response?.data?.error || 'Failed to get bonus mission';
+          Toast.show({ type: 'error', text1: 'Not Ready', text2: msg });
+      }
+  };
 
   const toggleMovement = async () => {
     const nextState = movementState === 'STILL' ? 'MOVING' : 'STILL';
@@ -98,13 +108,23 @@ export default function HomeScreen() {
   };
 
   const mockLongStationary = () => {
-      movementService.setMockStationarySince(45);
+      movementService.setMockStationarySince(Config.STATIONARY_THRESHOLD_MINUTES + Config.MOCK_STATIONARY_ADDITIONAL_MINUTES);
       setMovementState('STILL');
       Toast.show({
           type: 'success',
           text1: 'Time Warp!',
-          text2: 'Simulated 45 minutes of being still.',
+          text2: `Simulated ${Config.STATIONARY_THRESHOLD_MINUTES + Config.MOCK_STATIONARY_ADDITIONAL_MINUTES} minutes of being still.`,
       });
+  };
+
+  const simulateHike = async () => {
+    healthService.setMockSteps(Config.DAILY_STEP_GOAL);
+    await refreshData();
+    Toast.show({
+        type: 'success',
+        text1: 'Hike Simulated!',
+        text2: `Goal met: ${Config.DAILY_STEP_GOAL} steps!`,
+    });
   };
 
   const handleComplete = async (id: string) => {
@@ -168,7 +188,7 @@ export default function HomeScreen() {
       Toast.show({
         type: 'success',
         text1: 'Snoozed',
-        text2: 'You have 15 more minutes!',
+        text2: `You have ${Config.SNOOZE_MINUTES} more minutes!`,
       });
     } catch (error: any) {
         const msg = error.response?.data?.error || 'Error snoozing mission';
@@ -194,20 +214,20 @@ export default function HomeScreen() {
           styles.card, 
           { backgroundColor: colors.card }, 
           isCompleted && { backgroundColor: colors.background, opacity: 0.8 },
-          isMissed && { borderColor: '#e74c3c', borderWidth: 1, opacity: 0.7 }
+          isMissed && styles.missedCard
       ]}>
         <View style={styles.cardHeader}>
           <Text style={[
               styles.bracket, 
               { color: colors.secondary }, 
               isCompleted && { color: colors.success },
-              isMissed && { color: '#e74c3c' }
+              isMissed && styles.missedText
           ]}>
             {item.bracket.start} - {item.bracket.end}
           </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={styles.badgeRow}>
             {isCompleted && <Text style={[styles.doneBadge, { color: colors.success }]}>DONE</Text>}
-            {isMissed && <Text style={[styles.doneBadge, { color: '#e74c3c' }]}>MISSED</Text>}
+            {isMissed && <Text style={[styles.doneBadge, styles.missedText]}>MISSED</Text>}
             {!isCompleted && !isMissed && (
               <TouchableOpacity onPress={() => handleRefresh(item.id)}>
                 <Text style={styles.refreshIcon}>🔄</Text>
@@ -220,7 +240,7 @@ export default function HomeScreen() {
             styles.exerciseName, 
             { color: colors.text }, 
             !isNext && !isCompleted && !isMissed && { color: colors.subtext },
-            isMissed && { textDecorationLine: 'line-through' }
+            isMissed && styles.missedExerciseName
         ]}>
           {item.exerciseId.replace('-', ' ').toUpperCase()}
         </Text>
@@ -291,14 +311,41 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={mockLongStationary} style={[styles.debugBtn, { backgroundColor: colors.primary }]}>
                 <Text style={styles.debugBtnText}>Simulate 45m Still</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={simulateHike} style={[styles.debugBtn, { backgroundColor: '#9b59b6' }]}>
+                <Text style={styles.debugBtnText}>Simulate Hike</Text>
+            </TouchableOpacity>
         </View>
       </View>
 
-      {allCompleted && (
-        <View style={[styles.completionBanner, { backgroundColor: colors.success + '20' }]}>
-          <Text style={[styles.completionText, { color: colors.success }]}>
-            Well done for completing today's exercises! 🎉
+      <View style={[styles.statusBanner, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+          <Text style={[styles.statusText, { color: colors.text }]}>
+              👟 <Text style={styles.statusTextBold}>{totalSteps}</Text> steps today
           </Text>
+          {totalSteps >= Config.DAILY_STEP_GOAL ? (
+              <Text style={[styles.goalReached, { color: colors.success }]}>Daily goal reached! 🏆</Text>
+          ) : (
+              <Text style={[styles.statusSubtext, { color: colors.subtext }]}>
+                  {Config.DAILY_STEP_GOAL - totalSteps} steps to auto-complete all missions
+              </Text>
+          )}
+      </View>
+
+      {allCompleted && (
+        <View style={styles.completionContainer}>
+            <View style={[styles.completionBanner, styles.completionBannerSuccess]}>
+                <Text style={[styles.completionText, { color: colors.success }]}>
+                    {totalSteps >= Config.DAILY_STEP_GOAL ?
+                        `You completed ${totalSteps} steps today - all missions completed! Well done! 🎉` :
+                        "Well done for completing today's exercises! 🎉"}
+                </Text>
+            </View>
+
+            <TouchableOpacity
+                style={[styles.bonusBtn, { backgroundColor: colors.primary }]}
+                onPress={handleBonusMission}
+            >
+                <Text style={styles.bonusBtnText}>+ Extra Fun Mission</Text>
+            </TouchableOpacity>
         </View>
       )}
 
@@ -314,140 +361,3 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  streakInfo: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginTop: 2,
-  },
-  xpBarContainer: {
-    height: 6,
-    borderRadius: 3,
-    marginTop: 15,
-    overflow: 'hidden',
-  },
-  xpBar: {
-    height: '100%',
-  },
-  flexToggle: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  flexText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  list: {
-    padding: 16,
-  },
-  card: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  bracket: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  refreshIcon: {
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  exerciseName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginVertical: 8,
-  },
-  doneBadge: {
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    marginTop: 10,
-    gap: 10,
-  },
-  completeButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  snoozeButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  snoozeText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  completionBanner: {
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  completionText: {
-    fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  debugRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 15,
-      gap: 10,
-  },
-  debugBtn: {
-      flex: 1,
-      padding: 8,
-      borderRadius: 10,
-      alignItems: 'center',
-  },
-  debugBtnText: {
-      color: '#fff',
-      fontSize: 12,
-      fontWeight: 'bold',
-  }
-});

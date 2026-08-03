@@ -83,6 +83,21 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  missedCard: {
+    borderColor: '#e74c3c',
+    borderWidth: 1,
+    opacity: 0.7,
+  },
+  missedText: {
+    color: '#e74c3c',
+  },
+  missedExerciseName: {
+    textDecorationLine: 'line-through',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   buttonRow: {
     flexDirection: 'row',
     marginTop: 10,
@@ -114,6 +129,9 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
+  completionBannerSuccess: {
+    backgroundColor: '#2ecc7120',
+  },
   completionText: {
     fontSize: 16,
     fontWeight: '700',
@@ -129,6 +147,9 @@ export const styles = StyleSheet.create({
   },
   statusText: {
       fontSize: 16,
+  },
+  statusTextBold: {
+      fontWeight: 'bold',
   },
   statusSubtext: {
       fontSize: 12,

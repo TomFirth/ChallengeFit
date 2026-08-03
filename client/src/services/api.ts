@@ -30,6 +30,14 @@ export const missionApi = {
     const response = await api.post(`/missions/${id}/snooze`);
     return response.data;
   },
+  validateMission: async (id: string, steps: number) => {
+    const response = await api.post(`/missions/${id}/validate`, { steps });
+    return response.data;
+  },
+  getBonusMission: async () => {
+    const response = await api.post('/missions/bonus');
+    return response.data;
+  },
   updateAvailability: async (startTime: string, endTime: string) => {
     const response = await api.post('/missions/availability', { startTime, endTime });
     return response.data;

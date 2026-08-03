@@ -11,8 +11,9 @@ const xpService = new XPService();
 
 // List friends (Mocked for now as we don't have a friend table yet, just user IDs)
 router.get('/friends', async (req, res) => {
+  const userId = (req.user as any).id;
   const users = await prisma.user.findMany({
-      where: { NOT: { id: 'u1' } },
+      where: { NOT: { id: userId } },
       take: 5
   });
   res.json(users);
@@ -21,17 +22,19 @@ router.get('/friends', async (req, res) => {
 // Groups
 router.post('/groups', async (req, res) => {
   const { name, memberIds } = req.body;
-  const ownerId = 'u1';
+  const ownerId = (req.user as any).id;
   const group = await groupService.createGroup(name, ownerId, memberIds);
   res.json(group);
 });
 
 router.get('/groups', async (req, res) => {
-  const groups = await groupService.getGroups('u1');
+  const userId = (req.user as any).id;
+  const groups = await groupService.getGroups(userId);
   res.json(groups);
 });
 
 router.get('/groups/:id/leaderboard', async (req, res) => {
+  const userId = (req.user as any).id;
   const group = await groupService.getGroup(req.params.id);
   if (!group) return res.status(404).json({ error: 'Group not found' });
 
@@ -42,7 +45,7 @@ router.get('/groups/:id/leaderboard', async (req, res) => {
 
     // For mock data feel, if XP is 0, show a small amount for others
     let displayXP = periodXP;
-    if (user.id !== 'u1' && periodXP === 0) {
+    if (user.id !== userId && periodXP === 0) {
         displayXP = Math.floor(Math.random() * 200);
     }
 

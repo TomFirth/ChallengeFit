@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "FitnessQuest",
-    "slug": "fitness-quest",
+    "name": "ChallengeFit",
+    "slug": "challenge-fit",
+    "scheme": "fitnessquest",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,9 +18,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Fitness Quest needs background location to suppress mission alerts while you are already exercising.",
-        "NSLocationWhenInUseUsageDescription": "Fitness Quest needs location to track your activity.",
-        "NSMotionUsageDescription": "Fitness Quest uses motion data to detect when you are stationary for long periods."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Challenge Fit needs background location to suppress mission alerts while you are already exercising.",
+        "NSLocationWhenInUseUsageDescription": "Challenge Fit needs location to track your activity.",
+        "NSMotionUsageDescription": "Challenge Fit uses motion data to detect when you are stationary for long periods.",
+        "NSHealthUpdateUsageDescription": "Challenge Fit needs to read your activity data to automatically validate missions if you were active during their time window.",
+        "NSHealthShareUsageDescription": "Challenge Fit uses your activity data to help you complete fitness missions automatically."
       }
     },
     "android": {
@@ -32,7 +35,8 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "ACTIVITY_RECOGNITION",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "android.permission.health.READ_STEPS"
       ]
     },
     "web": {
@@ -40,8 +44,7 @@
     },
     "plugins": [
       "expo-secure-store",
-      "@react-native-community/datetimepicker",
-      "expo-notifications"
+      "@react-native-community/datetimepicker"
     ]
   }
 }

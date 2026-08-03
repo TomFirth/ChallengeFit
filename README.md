@@ -15,7 +15,7 @@ cd server
 npm install
 npm run dev
 ```
-The server runs on `http://localhost:3000` by default.
+The server runs on `http://localhost:3210` by default.
 
 ### 2. Start the Mobile App
 ```bash

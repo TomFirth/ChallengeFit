@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { styles } from '../styles/LoginScreenStyles';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
-import axios from 'axios';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import api from '../services/api';
 import Toast from 'react-native-toast-message';
 
@@ -28,6 +30,25 @@ export default function LoginScreen({ navigation }: any) {
       Toast.show({ type: 'error', text1: 'Login Failed', text2: msg });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    const authUrl = `${api.defaults.baseURL}/auth/${provider}`;
+    try {
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, 'fitnessquest://auth');
+      if (result.type === 'success' && result.url) {
+        const { queryParams } = Linking.parse(result.url);
+        if (queryParams?.token) {
+          // Fetch user profile with this token
+          api.defaults.headers.common['Authorization'] = `Bearer ${queryParams.token}`;
+          const profile = await api.get('/auth/me');
+          await login(queryParams.token as string, profile.data);
+        }
+      }
+    } catch (error) {
+      console.error(`${provider} login error:`, error);
+      Toast.show({ type: 'error', text1: 'Social Login Failed' });
     }
   };
 
@@ -73,11 +94,17 @@ export default function LoginScreen({ navigation }: any) {
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <Text style={[styles.orText, { color: colors.subtext, backgroundColor: colors.background }]}>OR</Text>
 
-          <TouchableOpacity style={[styles.socialBtn, { backgroundColor: '#db4437' }]}>
+          <TouchableOpacity
+            style={[styles.socialBtn, { backgroundColor: '#db4437' }]}
+            onPress={() => handleSocialLogin('google')}
+          >
             <Text style={styles.socialBtnText}>Login with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.socialBtn, { backgroundColor: '#4267B2' }]}>
+          <TouchableOpacity
+            style={[styles.socialBtn, { backgroundColor: '#4267B2' }]}
+            onPress={() => handleSocialLogin('facebook')}
+          >
             <Text style={styles.socialBtnText}>Login with Facebook</Text>
           </TouchableOpacity>
         </View>
@@ -86,19 +113,3 @@ export default function LoginScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: { flex: 1, justifyContent: 'center', padding: 30 },
-  logo: { fontSize: 32, fontWeight: 'bold', textAlign: 'center' },
-  subtitle: { fontSize: 16, textAlign: 'center', marginBottom: 40 },
-  form: { gap: 15 },
-  input: { height: 55, borderRadius: 12, paddingHorizontal: 15, borderWidth: 1 },
-  loginBtn: { height: 55, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 10 },
-  loginBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  switchText: { textAlign: 'center', marginTop: 15, fontWeight: '600' },
-  socialSection: { marginTop: 40, gap: 15 },
-  divider: { height: 1, width: '100%', position: 'absolute', top: 10 },
-  orText: { alignSelf: 'center', paddingHorizontal: 10, fontSize: 14, fontWeight: 'bold', marginBottom: 10 },
-  socialBtn: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  socialBtnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-});

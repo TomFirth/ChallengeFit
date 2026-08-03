@@ -5,7 +5,7 @@ services:
       - "8443:8443"
     environment:
       - PORT=8443
-      - DATABASE_URL=postgresql://user:password@db:5432/fitnessquest
+      - DATABASE_URL=postgresql://user:password@db:5432/challengefit
       - NODE_ENV=production
     depends_on:
       - db
@@ -15,11 +15,11 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=fitnessquest
+      - POSTGRES_DB=challengefit
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5555:5432"
 
 volumes:
   postgres_data:

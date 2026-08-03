@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 // Threshold for auto-validating a mission based on physical activity
-const STEP_THRESHOLD = 500;
+const STEP_THRESHOLD_PER_MISSION = 2000;
 
 export interface ActivityReport {
   steps: number;
@@ -14,6 +14,14 @@ class HealthService {
 
   constructor() {
     // In a real environment, we would initialize Pedometer or Health Connect here
+  }
+
+  /**
+   * Fetches total step count for the current day.
+   */
+  async getTodayTotalSteps(): Promise<number> {
+      console.log(`[HealthService] Querying total steps for today`);
+      return this.mockSteps > 0 ? this.mockSteps : 0;
   }
 
   /**

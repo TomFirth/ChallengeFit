@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { missionApi } from '../services/api';
 import { Mission } from '../types';
+import { useAuth } from './useAuth';
 
 type DataContextType = {
   missions: Mission[];
@@ -15,11 +16,13 @@ type DataContextType = {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [userStats, setUserStatsState] = useState({ xp: 0, level: 0, streak: 0, availability: null });
   const [allCompleted, setAllCompleted] = useState(false);
 
   const refreshData = async () => {
+    if (!user) return;
     try {
       const data = await missionApi.getTodayMissions();
       setMissions(data.missions);
@@ -39,8 +42,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    refreshData();
-  }, []);
+    if (user) {
+        refreshData();
+    } else {
+        setMissions([]);
+        setUserStatsState({ xp: 0, level: 0, streak: 0, availability: null });
+        setAllCompleted(false);
+    }
+  }, [user]);
 
   return (
     <DataContext.Provider value={{

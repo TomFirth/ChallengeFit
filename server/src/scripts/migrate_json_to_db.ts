@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import bcrypt from 'bcryptjs';
 import { prisma } from '../services/PrismaClient.js';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -11,12 +12,15 @@ async function migrate() {
   try {
     const userData = JSON.parse(await fs.readFile(path.join(DATA_DIR, 'user.json'), 'utf-8'));
     console.log(`Migrating user: ${userData.username}`);
+    const hashedPassword = await bcrypt.hash('password123', 10);
     await prisma.user.upsert({
       where: { username: userData.username },
       update: {},
       create: {
         id: userData.id,
         username: userData.username,
+        email: 'tom@example.com',
+        password: hashedPassword,
         startTime: userData.availability[0].startTime,
         endTime: userData.availability[0].endTime,
         currentLevel: userData.currentLevel,

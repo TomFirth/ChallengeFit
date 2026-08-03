@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Switch, TouchableOpacity, Platform, Modal, Share } from 'react-native';
+import { Text, View, Switch, TouchableOpacity, Platform, Modal, Share } from 'react-native';
+import { styles } from '../styles/SettingsScreenStyles';
 import { useTheme } from '../hooks/useTheme';
 import { useData } from '../hooks/useData';
+import { useAuth } from '../hooks/useAuth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { missionApi } from '../services/api';
 import Toast from 'react-native-toast-message';
@@ -9,6 +11,7 @@ import Toast from 'react-native-toast-message';
 export default function SettingsScreen() {
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const { refreshData } = useData();
+  const { logout, user } = useAuth();
 
   // Availability state
   const [showModal, setShowModal] = useState(false);
@@ -81,12 +84,22 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Account</Text>
+        <View style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1, borderTopColor: colors.border, borderTopWidth: 1 }]}>
+          <Text style={[styles.settingText, { color: colors.text }]}>Username</Text>
+          <Text style={{ color: colors.subtext }}>{user?.username}</Text>
+        </View>
         <TouchableOpacity
           style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1 }]}
           onPress={() => setShowModal(true)}
         >
           <Text style={[styles.settingText, { color: colors.text }]}>Profile Availability</Text>
           <Text style={{ color: colors.subtext }}>{formatTime(startTime)} - {formatTime(endTime)}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1 }]}
+          onPress={logout}
+        >
+          <Text style={[styles.settingText, { color: '#e74c3c', fontWeight: 'bold' }]}>Logout</Text>
         </TouchableOpacity>
       </View>
 
@@ -151,84 +164,3 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  section: {
-    marginTop: 25,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginLeft: 15,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    paddingHorizontal: 20,
-  },
-  settingText: {
-    fontSize: 16,
-  },
-  footer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    borderRadius: 20,
-    padding: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  timeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 30,
-  },
-  cancelBtn: {
-    padding: 12,
-  },
-  saveBtn: {
-    padding: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  }
-});
