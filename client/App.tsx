@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { Text, View, ActivityIndicator } from 'react-native';
+import { styles } from './src/styles/AppStyles';
 import HomeScreen from './src/screens/HomeScreen';
 import SocialScreen from './src/screens/SocialScreen';
 import LeaderboardScreen from './src/screens/LeaderboardScreen';
@@ -35,7 +36,7 @@ function AppContent() {
 
   if (isLoading) {
       return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+          <View style={[styles.centered, { backgroundColor: colors.background }]}>
               <ActivityIndicator size="large" color={colors.primary} />
           </View>
       );
@@ -73,7 +74,7 @@ function AppContent() {
               component={HomeScreen}
               options={{
                 tabBarLabel: 'Missions',
-                tabBarIcon: ({ color }) => <Text style={{ color }}>🎯</Text>
+                tabBarIcon: ({ color }) => <Text style={[styles.tabIcon, { color }]}>🎯</Text>
               }}
             />
             <Tab.Screen
@@ -81,7 +82,7 @@ function AppContent() {
               component={SocialScreen}
               options={{
                 tabBarLabel: 'Feed',
-                tabBarIcon: ({ color }) => <Text style={{ color }}>🗞️</Text>
+                tabBarIcon: ({ color }) => <Text style={[styles.tabIcon, { color }]}>🗞️</Text>
               }}
             />
             <Tab.Screen
@@ -89,7 +90,7 @@ function AppContent() {
               component={LeaderboardNavigator}
               options={{
                 tabBarLabel: 'Ranks',
-                tabBarIcon: ({ color }) => <Text style={{ color }}>🏆</Text>
+                tabBarIcon: ({ color }) => <Text style={[styles.tabIcon, { color }]}>🏆</Text>
               }}
             />
             <Tab.Screen
@@ -97,13 +98,10 @@ function AppContent() {
               component={SettingsScreen}
               options={{
                 tabBarLabel: 'Settings',
-                tabBarIcon: ({ color }) => <Text style={{ color }}>⚙️</Text>
+                tabBarIcon: ({ color }) => <Text style={[styles.tabIcon, { color }]}>⚙️</Text>
               }}
             />
           </Tab.Navigator>
-      ) : (
-          <AuthStack />
-      )}
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <Toast />
     </NavigationContainer>

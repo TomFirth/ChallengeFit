@@ -30,8 +30,34 @@ export const styles = StyleSheet.create({
     padding: 16,
     paddingHorizontal: 20,
   },
+  settingRowBorder: {
+    borderBottomWidth: 1,
+  },
+  settingRowTopBorder: {
+    borderTopWidth: 1,
+  },
   settingText: {
     fontSize: 16,
+  },
+  logoutText: {
+    color: '#e74c3c',
+    fontWeight: 'bold',
+  },
+  subtext: {
+    fontSize: 14,
+  },
+  shareIcon: {
+    fontSize: 18,
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  whiteBoldText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  footerText: {
+    fontSize: 12,
   },
   footer: {
     flex: 1,

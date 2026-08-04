@@ -1,4 +1,4 @@
-# Fitness Quest - Implementation Roadmap
+# Challenge Fit - Implementation Roadmap
 
 ## ✅ Completed Milestones
 **Current State**: Core loop established, group competition live, and mission rules strictly enforced.
@@ -36,5 +36,12 @@
 
 ### 4. Advanced Social
 - [ ] **Friend Discovery**: Search for users by username or email.
+- [ ] **Friend Management**: Develop comprehensive friend management system (friend tables, request flows).
 - [ ] **Group Management**: Administrative controls for group owners (kick/invite).
 - [ ] **Global Season Leaderboards**: Competitive "Seasons" with unique badges and rewards.
+- [ ] **Feed Filtering**: Enhance feed filtering logic to show only relevant friend events.
+
+### 5. Backend & Data
+- [ ] **Streak Tracking**: Implement server-side streak tracking logic in the database.
+- [ ] **XP Logging**: Build sophisticated XP logging and history tracking.
+- [ ] **Persistent Cooldowns**: Implement persistent tracking for mission refreshes in the database.

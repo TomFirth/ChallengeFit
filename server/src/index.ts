@@ -22,7 +22,7 @@ app.use('/api/social', protect, socialRoutes);
 app.use('/api/missions', protect, missionRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Fitness Quest API is running');
+  res.send('Challenge Fit API is running');
 });
 
 const PORT = process.env.PORT || 3000;

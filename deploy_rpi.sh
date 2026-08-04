@@ -5,7 +5,7 @@ REMOTE_USER="barber"
 REMOTE_HOST="192.168.1.81"
 REMOTE_DIR="challengefit"
 
-echo "🚀 Deploying Fitness Quest to Raspberry Pi ($REMOTE_HOST)..."
+echo "🚀 Deploying Challenge Fit to Raspberry Pi ($REMOTE_HOST)..."
 
 # 1. Ensure remote directory exists
 ssh $REMOTE_USER@$REMOTE_HOST "mkdir -p $REMOTE_DIR"

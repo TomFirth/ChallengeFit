@@ -25,6 +25,7 @@ export default function RegisterScreen({ navigation }: any) {
       const response = await api.post('/auth/register', { username, email, password });
       await login(response.data.token, response.data.user);
     } catch (error: any) {
+      console.error('[Register] Error:', error.response?.data || error.message);
       const msg = error.response?.data?.error || 'Registration failed';
       Toast.show({ type: 'error', text1: 'Error', text2: msg });
     } finally {

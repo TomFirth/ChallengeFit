@@ -26,6 +26,7 @@ export default function LoginScreen({ navigation }: any) {
       const response = await api.post('/auth/login', { email, password });
       await login(response.data.token, response.data.user);
     } catch (error: any) {
+      console.error('[Login] Error:', error.response?.data || error.message);
       const msg = error.response?.data?.error || 'Login failed';
       Toast.show({ type: 'error', text1: 'Login Failed', text2: msg });
     } finally {
@@ -36,11 +37,10 @@ export default function LoginScreen({ navigation }: any) {
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     const authUrl = `${api.defaults.baseURL}/auth/${provider}`;
     try {
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, 'fitnessquest://auth');
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, 'challengefit://auth');
       if (result.type === 'success' && result.url) {
         const { queryParams } = Linking.parse(result.url);
         if (queryParams?.token) {
-          // Fetch user profile with this token
           api.defaults.headers.common['Authorization'] = `Bearer ${queryParams.token}`;
           const profile = await api.get('/auth/me');
           await login(queryParams.token as string, profile.data);
@@ -55,8 +55,8 @@ export default function LoginScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
-        <Text style={[styles.logo, { color: colors.primary }]}>🎯 Fitness Quest</Text>
-        <Text style={[styles.subtitle, { color: colors.subtext }]}>Your journey begins here.</Text>
+        <Text style={[styles.logo, { color: colors.primary }]}>Challenge Fit</Text>
+        <Text style={[styles.subtitle, { color: colors.subtext }]}>Little wins, lasting strength.</Text>
 
         <View style={styles.form}>
           <TextInput
@@ -95,14 +95,14 @@ export default function LoginScreen({ navigation }: any) {
           <Text style={[styles.orText, { color: colors.subtext, backgroundColor: colors.background }]}>OR</Text>
 
           <TouchableOpacity
-            style={[styles.socialBtn, { backgroundColor: '#db4437' }]}
+            style={[styles.socialBtn, styles.socialBtnGoogle]}
             onPress={() => handleSocialLogin('google')}
           >
             <Text style={styles.socialBtnText}>Login with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.socialBtn, { backgroundColor: '#4267B2' }]}
+            style={[styles.socialBtn, styles.socialBtnFacebook]}
             onPress={() => handleSocialLogin('facebook')}
           >
             <Text style={styles.socialBtnText}>Login with Facebook</Text>

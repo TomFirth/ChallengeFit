@@ -1,4 +1,4 @@
-# Fitness Quest
+# Challenge Fit
 
 A gamified exercise app built with React Native (Expo) and Node.js (Express).
 
@@ -7,17 +7,32 @@ A gamified exercise app built with React Native (Expo) and Node.js (Express).
 ### Prerequisites
 - Node.js v24.16.0+
 - Android Studio / Emulator
-- Docker (optional, for DB/Server containers)
+- Docker & Docker Compose
 
-### 1. Start the Backend
+### 1. First-Time Setup (Database)
+The app requires a PostgreSQL database. We use Docker to manage this easily.
+
+1.  Start the database container:
+    ```bash
+    docker compose up -d db
+    ```
+2.  Configure your environment:
+    - Create/Update `server/.env` and set:
+      `DATABASE_URL="postgresql://user:password@localhost:5555/challengefit"`
+3.  Initialize the database schema:
+    ```bash
+    cd server
+    npx prisma migrate dev --name init
+    ```
+
+### 2. Start the Backend
 ```bash
 cd server
 npm install
 npm run dev
 ```
-The server runs on `http://localhost:3210` by default.
 
-### 2. Start the Mobile App
+### 3. Start the Mobile App
 ```bash
 cd client
 npm install

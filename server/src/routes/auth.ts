@@ -12,7 +12,6 @@ const generateToken = (user: any) => {
   });
 };
 
-// Register
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -37,11 +36,11 @@ router.post('/register', async (req, res) => {
     const token = generateToken(user);
     res.json({ token, user });
   } catch (err) {
+    console.error('[Auth] Registration error:', err);
     res.status(500).json({ error: 'Failed to register' });
   }
 });
 
-// Login
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', { session: false }, (err: any, user: any, info: any) => {
     if (err) return next(err);
@@ -52,24 +51,20 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-// Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback', passport.authenticate('google', { session: false }), (req, res) => {
   const token = generateToken(req.user);
-  // In a real mobile app, we might redirect to a custom scheme
-  res.redirect(`fitnessquest://auth?token=${token}`);
+  res.redirect(`challengefit://auth?token=${token}`);
 });
 
-// Facebook Auth
 router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
 
 router.get('/facebook/callback', passport.authenticate('facebook', { session: false }), (req, res) => {
   const token = generateToken(req.user);
-  res.redirect(`fitnessquest://auth?token=${token}`);
+  res.redirect(`challengefit://auth?token=${token}`);
 });
 
-// Get Profile
 router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
   res.json(req.user);
 });

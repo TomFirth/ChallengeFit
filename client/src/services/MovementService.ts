@@ -6,7 +6,7 @@ class MovementService {
   private thresholdMinutes = 40;
   private state: MovementState = 'STILL';
   private stationarySince: Date = new Date();
-  private mockMode = true; // Default to true for testing
+  private mockMode = true;
 
   constructor() {
     this.loadState();
@@ -31,8 +31,6 @@ class MovementService {
       this.stationarySince = new Date();
       await SecureStore.setItemAsync('movement_stationary_since', this.stationarySince.toISOString());
     } else if (newState === 'MOVING') {
-      // If moving, we don't care about stationary time anymore
-      // We'll reset it when they stop again
     }
   }
 
@@ -48,12 +46,9 @@ class MovementService {
   }
 
   isAvailableForMission(): boolean {
-    // Logic: Tell user to do something ONLY if they've been stationary for >= threshold
-    // AND they aren't currently moving.
     return this.state === 'STILL' && this.getStationaryMinutes() >= this.thresholdMinutes;
   }
 
-  // Helper for testing
   setMockStationarySince(minutesAgo: number) {
     this.stationarySince = new Date(Date.now() - minutesAgo * 60 * 1000);
     this.state = 'STILL';

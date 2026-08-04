@@ -45,11 +45,11 @@ export default function LeaderboardScreen({ navigation }: any) {
     const myRank = data.findIndex(item => item.id === 'u1') + 1;
     const myXP = data.find(item => item.id === 'u1')?.xp || 0;
 
-    let message = `Check out our ${groupName} leaderboard on Fitness Quest! 🏆\n\n`;
+    let message = `Check out our ${groupName} leaderboard on Challenge Fit! 🏆\n\n`;
     if (myRank > 0) {
       message += `I'm currently #${myRank} with ${myXP} XP! 💪`;
     } else {
-      message += `Join us and start your fitness quest!`;
+      message += `Join us and start your challenge!`;
     }
 
     try {
@@ -97,7 +97,7 @@ export default function LeaderboardScreen({ navigation }: any) {
           <View style={styles.headerButtons}>
             {selectedGroupId && (
               <TouchableOpacity
-                style={[styles.shareBtn, { backgroundColor: colors.background, borderColor: colors.border, borderWidth: 1 }]}
+                style={[styles.shareBtn, { backgroundColor: colors.background, borderColor: colors.border }]}
                 onPress={handleShare}
               >
                 <Text style={[styles.shareBtnText, { color: colors.text }]}>📤 Share</Text>
@@ -127,7 +127,7 @@ export default function LeaderboardScreen({ navigation }: any) {
               ]}
               onPress={() => setSelectedGroupId(item.id)}
             >
-              <Text style={{ color: selectedGroupId === item.id ? '#fff' : colors.text, fontWeight: 'bold' }}>
+              <Text style={[styles.groupTabText, { color: selectedGroupId === item.id ? '#fff' : colors.text }]}>
                 {item.name}
               </Text>
             </TouchableOpacity>

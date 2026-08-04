@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ChallengeFit",
+    "name": "Challenge Fit",
     "slug": "challenge-fit",
-    "scheme": "fitnessquest",
+    "scheme": "challengefit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,8 @@
         "NSMotionUsageDescription": "Challenge Fit uses motion data to detect when you are stationary for long periods.",
         "NSHealthUpdateUsageDescription": "Challenge Fit needs to read your activity data to automatically validate missions if you were active during their time window.",
         "NSHealthShareUsageDescription": "Challenge Fit uses your activity data to help you complete fitness missions automatically."
-      }
+      },
+      "bundleIdentifier": "com.tomfirth.challengefit"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,7 +38,8 @@
         "ACTIVITY_RECOGNITION",
         "POST_NOTIFICATIONS",
         "android.permission.health.READ_STEPS"
-      ]
+      ],
+      "package": "com.tomfirth.challengefit"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -45,6 +47,11 @@
     "plugins": [
       "expo-secure-store",
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7193b400-4c19-4ab4-aef1-3a7a04c57a90"
+      }
+    }
   }
 }

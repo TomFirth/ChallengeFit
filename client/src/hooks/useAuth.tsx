@@ -29,7 +29,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
-        // Set default header for future requests
         api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
       }
     } catch (e) {

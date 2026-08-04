@@ -9,7 +9,6 @@ export const feedService = new FeedService();
 const groupService = new GroupService();
 const xpService = new XPService();
 
-// List friends (Mocked for now as we don't have a friend table yet, just user IDs)
 router.get('/friends', async (req, res) => {
   const userId = (req.user as any).id;
   const users = await prisma.user.findMany({
@@ -19,7 +18,6 @@ router.get('/friends', async (req, res) => {
   res.json(users);
 });
 
-// Groups
 router.post('/groups', async (req, res) => {
   const { name, memberIds } = req.body;
   const ownerId = (req.user as any).id;
@@ -43,7 +41,6 @@ router.get('/groups/:id/leaderboard', async (req, res) => {
   const leaderboard = await Promise.all(group.members.map(async (user: any) => {
     const periodXP = await xpService.getXPForUser(user.id, startDate);
 
-    // For mock data feel, if XP is 0, show a small amount for others
     let displayXP = periodXP;
     if (user.id !== userId && periodXP === 0) {
         displayXP = Math.floor(Math.random() * 200);
@@ -59,12 +56,10 @@ router.get('/groups/:id/leaderboard', async (req, res) => {
   res.json(leaderboard);
 });
 
-// Get friend feed
 router.get('/feed', (req, res) => {
   res.json(feedService.getFeed(['u2', 'u3']));
 });
 
-// Get global leaderboards
 router.get('/leaderboard', async (req, res) => {
   const users = await prisma.user.findMany({
       orderBy: { totalXP: 'desc' },

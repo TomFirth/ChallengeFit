@@ -1,7 +1,7 @@
-# Fitness Quest - Technical Design Document
+# Challenge Fit - Technical Design Document
 
 ## 1. Introduction
-Fitness Quest is a gamified exercise app designed to build consistent habits through randomly scheduled "missions." It emphasizes small, achievable workouts over long gym sessions.
+Challenge Fit is a gamified exercise app designed to build consistent habits through randomly scheduled "missions." It emphasizes small, achievable workouts over long gym sessions.
 
 ## 2. System Architecture
 

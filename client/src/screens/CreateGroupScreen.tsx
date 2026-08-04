@@ -79,7 +79,7 @@ export default function CreateGroupScreen({ navigation }: any) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={{ color: colors.primary, fontSize: 18 }}>Back</Text>
+          <Text style={[styles.backBtnText, { color: colors.primary }]}>Back</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>New Group</Text>
       </View>
@@ -94,7 +94,7 @@ export default function CreateGroupScreen({ navigation }: any) {
           onChangeText={setGroupName}
         />
 
-        <Text style={[styles.label, { color: colors.subtext, marginTop: 20 }]}>Select Contacts</Text>
+        <Text style={[styles.label, styles.labelMargin, { color: colors.subtext }]}>Select Contacts</Text>
         {loading ? (
           <ActivityIndicator size="small" color={colors.primary} />
         ) : (

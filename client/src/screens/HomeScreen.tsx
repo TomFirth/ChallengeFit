@@ -19,13 +19,16 @@ export default function HomeScreen() {
   const [totalSteps, setTotalSteps] = useState(0);
 
   useEffect(() => {
-    // Check for immediate toast if app is open
+    refreshData();
+    healthService.getTodayTotalSteps().then(setTotalSteps);
+
     const checkRequiredMissions = () => {
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
       missions.forEach(mission => {
-        if (mission.status === 'PENDING' && currentTime === mission.bracket.start) {
+        const bracketStart = mission.bracket?.start || (mission as any).bracketStart;
+        if (mission.status === 'PENDING' && currentTime === bracketStart) {
           if (movementService.isAvailableForMission()) {
             Toast.show({
               type: 'info',
@@ -38,12 +41,9 @@ export default function HomeScreen() {
       });
     };
 
-    refreshData();
-    healthService.getTodayTotalSteps().then(setTotalSteps);
-
     const interval = setInterval(checkRequiredMissions, Config.CHECK_MISSIONS_INTERVAL);
     return () => clearInterval(interval);
-  }, [missions]);
+  }, []); // Run on mount only
 
   useEffect(() => {
       const runCatchup = async () => {
@@ -52,9 +52,12 @@ export default function HomeScreen() {
           const steps = await healthService.getTodayTotalSteps();
           setTotalSteps(steps);
 
-          // Tiered validation
           const tiers = [Config.STEP_THRESHOLD_PER_MISSION, Config.STEP_THRESHOLD_PER_MISSION * 2, Config.DAILY_STEP_GOAL];
-          const pendingMissions = missions.filter(m => m.status !== 'COMPLETED').sort((a, b) => a.bracketStart.localeCompare(b.bracketStart));
+          const pendingMissions = missions.filter(m => m.status !== 'COMPLETED').sort((a, b) => {
+              const startA = a.bracket?.start || (a as any).bracketStart || '';
+              const startB = b.bracket?.start || (b as any).bracketStart || '';
+              return startA.localeCompare(startB);
+          });
           const completedCount = missions.filter(m => m.status === 'COMPLETED').length;
 
           for (let i = 0; i < pendingMissions.length; i++) {
@@ -86,11 +89,11 @@ export default function HomeScreen() {
           await refreshData();
           Toast.show({
               type: 'success',
-              text1: 'Bonus Unlocked!',
-              text2: 'A special extra challenge just for you! 🎯',
+              text1: 'Extra Credit Unlocked!',
+              text2: 'One more challenge for today! 🎯',
           });
       } catch (error: any) {
-          const msg = error.response?.data?.error || 'Failed to get bonus mission';
+          const msg = error.response?.data?.error || 'Failed to get extra credit mission';
           Toast.show({ type: 'error', text1: 'Not Ready', text2: msg });
       }
   };
@@ -207,7 +210,9 @@ export default function HomeScreen() {
 
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const isInsideBracket = currentTime >= item.bracket.start && currentTime <= item.bracket.end;
+    const bracketStart = item.bracket?.start || (item as any).bracketStart;
+    const bracketEnd = item.bracket?.end || (item as any).bracketEnd;
+    const isInsideBracket = currentTime >= bracketStart && currentTime <= bracketEnd;
 
     return (
       <View style={[
@@ -223,7 +228,7 @@ export default function HomeScreen() {
               isCompleted && { color: colors.success },
               isMissed && styles.missedText
           ]}>
-            {item.bracket.start} - {item.bracket.end}
+            {bracketStart} - {bracketEnd}
           </Text>
           <View style={styles.badgeRow}>
             {isCompleted && <Text style={[styles.doneBadge, { color: colors.success }]}>DONE</Text>}
@@ -330,7 +335,7 @@ export default function HomeScreen() {
           )}
       </View>
 
-      {allCompleted && (
+      {allCompleted && !missions.some(m => m.id.startsWith('bonus-')) && (
         <View style={styles.completionContainer}>
             <View style={[styles.completionBanner, styles.completionBannerSuccess]}>
                 <Text style={[styles.completionText, { color: colors.success }]}>
@@ -344,8 +349,18 @@ export default function HomeScreen() {
                 style={[styles.bonusBtn, { backgroundColor: colors.primary }]}
                 onPress={handleBonusMission}
             >
-                <Text style={styles.bonusBtnText}>+ Extra Fun Mission</Text>
+                <Text style={styles.bonusBtnText}>+ Extra Credit?</Text>
             </TouchableOpacity>
+        </View>
+      )}
+
+      {allCompleted && missions.some(m => m.id.startsWith('bonus-')) && missions.find(m => m.id.startsWith('bonus-'))?.status === 'COMPLETED' && (
+        <View style={styles.completionContainer}>
+            <View style={[styles.completionBanner, styles.completionBannerSuccess]}>
+                <Text style={[styles.completionText, { color: colors.success }]}>
+                    Today's quest is complete, including Extra Credit! 🏆 See you tomorrow!
+                </Text>
+            </View>
         </View>
       )}
 

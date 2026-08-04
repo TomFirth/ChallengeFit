@@ -29,6 +29,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     marginRight: 10,
+    borderWidth: 1,
   },
   shareBtnText: {
     fontWeight: 'bold',
@@ -54,6 +55,9 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
     borderWidth: 1,
+  },
+  groupTabText: {
+    fontWeight: 'bold',
   },
   centered: {
     flex: 1,

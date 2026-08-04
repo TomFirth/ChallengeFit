@@ -59,6 +59,11 @@ router.get('/today', async (req, res) => {
     });
 
     if (dailyMissions.length === 0) {
+      // Clear any missions from previous days that might be hanging around
+      await prisma.mission.deleteMany({
+        where: { userId, createdAt: { lt: today } }
+      });
+
       const generated = await missionService.generateDailyMissions(user as any);
       for (const m of generated) {
           await prisma.mission.create({
@@ -81,7 +86,6 @@ router.get('/today', async (req, res) => {
         await runFailureCheck(userId);
     }
 
-    // Refresh user data after checks
     user = await prisma.user.findUnique({ where: { id: userId } });
     const missions = await prisma.mission.findMany({
         where: { userId, createdAt: { gte: today } }
@@ -149,7 +153,6 @@ router.post('/:id/complete', async (req, res) => {
           currentLevel: gamificationService.calculateLevel(user.totalXP + xpEarned),
           lastCompletionDate: new Date(),
           daysActive: user.daysActive + 1
-          // Note: updateStreak logic needs to be integrated here or simplified for DB
       }
   });
 
@@ -204,7 +207,6 @@ router.post('/:id/validate', async (req, res) => {
     if (!mission) return res.status(404).json({ error: 'Mission not found' });
     if (mission.status === 'COMPLETED') return res.status(400).json({ error: 'Already completed' });
 
-    // Validate if activity meets threshold (2000 steps per mission)
     if (steps < 2000) {
         return res.status(400).json({ error: 'Physical activity not high enough for auto-validation (need 2000 steps)' });
     }
@@ -216,7 +218,7 @@ router.post('/:id/validate', async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: mission.userId } });
     if (user) {
-        const xpEarned = 10; // Flat XP for auto-validation
+        const xpEarned = 10;
         await prisma.user.update({
             where: { id: user.id },
             data: {
@@ -235,7 +237,6 @@ router.post('/bonus', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Ensure all 3 daily missions are done
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dailyMissions = await prisma.mission.findMany({
@@ -246,10 +247,8 @@ router.post('/bonus', async (req, res) => {
         return res.status(400).json({ error: 'Complete your 3 daily missions first!' });
     }
 
-    // Generate a bonus mission (excluding ones already done today)
     const usedExerciseIds = dailyMissions.map(m => m.exerciseId);
 
-    // For MVP, we'll just generate new ones and find the first that isn't used
     const generated = await missionService.generateDailyMissions(user as any);
     const bonusEx = generated.find(m => !usedExerciseIds.includes(m.exerciseId)) || generated[0];
 
@@ -260,8 +259,8 @@ router.post('/bonus', async (req, res) => {
             exerciseId: bonusEx.exerciseId,
             scheduledTime: new Date(),
             status: 'PENDING',
-            bracketStart: '00:00', // Always available
-            bracketEnd: '23:59',   // Till end of day
+            bracketStart: '00:00',
+            bracketEnd: '23:59',
         }
     });
 
@@ -278,7 +277,6 @@ router.post('/availability', async (req, res) => {
       data: { startTime, endTime }
   });
 
-  // Re-generate missions logic... for simplicity in MVP, we delete today's pending missions and regenerate
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   await prisma.mission.deleteMany({

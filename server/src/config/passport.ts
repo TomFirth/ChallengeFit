@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Local Strategy
 passport.use(
   new LocalStrategy(
     { usernameField: 'email' },
@@ -33,7 +32,6 @@ passport.use(
   )
 );
 
-// JWT Strategy
 passport.use(
   new JwtStrategy(
     {
@@ -54,7 +52,6 @@ passport.use(
   )
 );
 
-// Google Strategy
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(
     new GoogleStrategy(
@@ -87,7 +84,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   );
 }
 
-// Facebook Strategy
 if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
   passport.use(
     new FacebookStrategy(

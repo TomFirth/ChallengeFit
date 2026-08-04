@@ -22,10 +22,16 @@ export const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  backBtnText: {
+    fontSize: 18,
+  },
   label: {
     fontSize: 14,
     marginBottom: 8,
     fontWeight: '600',
+  },
+  labelMargin: {
+    marginTop: 20,
   },
   input: {
     height: 50,

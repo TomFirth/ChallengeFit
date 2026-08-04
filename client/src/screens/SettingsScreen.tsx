@@ -13,7 +13,6 @@ export default function SettingsScreen() {
   const { refreshData } = useData();
   const { logout, user } = useAuth();
 
-  // Availability state
   const [showModal, setShowModal] = useState(false);
   const [startTime, setStartTime] = useState(new Date(new Date().setHours(9, 0, 0, 0)));
   const [endTime, setEndTime] = useState(new Date(new Date().setHours(18, 0, 0, 0)));
@@ -47,8 +46,8 @@ export default function SettingsScreen() {
   const handleShareApp = async () => {
     try {
       await Share.share({
-        message: 'Join me on Fitness Quest and start your gamified exercise journey! 🎯\nDownload it here: https://fitnessquest.app/download',
-        title: 'Fitness Quest',
+        message: 'Join me on Challenge Fit and start your gamified exercise journey! 🎯\nDownload it here: https://challengefit.app/download',
+        title: 'Challenge Fit',
       });
     } catch (e) {
       console.error('Error sharing app:', e);
@@ -56,7 +55,7 @@ export default function SettingsScreen() {
   };
 
   const onPickerChange = (event: any, selectedDate?: Date) => {
-    setShowPicker(false); // Immediate close on Android, valid for iOS too
+    setShowPicker(false);
     if (selectedDate) {
       if (pickerMode === 'start') setStartTime(selectedDate);
       else setEndTime(selectedDate);
@@ -71,7 +70,7 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Appearance</Text>
-        <View style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderTopColor: colors.border, borderTopWidth: 1, borderBottomWidth: 1 }]}>
+        <View style={[styles.settingRow, styles.settingRowBorder, styles.settingRowTopBorder, { backgroundColor: colors.card, borderBottomColor: colors.border, borderTopColor: colors.border }]}>
           <Text style={[styles.settingText, { color: colors.text }]}>Dark Mode</Text>
           <Switch
             value={isDarkMode}
@@ -84,33 +83,33 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Account</Text>
-        <View style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1, borderTopColor: colors.border, borderTopWidth: 1 }]}>
+        <View style={[styles.settingRow, styles.settingRowBorder, styles.settingRowTopBorder, { backgroundColor: colors.card, borderBottomColor: colors.border, borderTopColor: colors.border }]}>
           <Text style={[styles.settingText, { color: colors.text }]}>Username</Text>
-          <Text style={{ color: colors.subtext }}>{user?.username}</Text>
+          <Text style={[styles.subtext, { color: colors.subtext }]}>{user?.username}</Text>
         </View>
         <TouchableOpacity
-          style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1 }]}
+          style={[styles.settingRow, styles.settingRowBorder, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
           onPress={() => setShowModal(true)}
         >
           <Text style={[styles.settingText, { color: colors.text }]}>Profile Availability</Text>
-          <Text style={{ color: colors.subtext }}>{formatTime(startTime)} - {formatTime(endTime)}</Text>
+          <Text style={[styles.subtext, { color: colors.subtext }]}>{formatTime(startTime)} - {formatTime(endTime)}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1 }]}
+          style={[styles.settingRow, styles.settingRowBorder, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
           onPress={logout}
         >
-          <Text style={[styles.settingText, { color: '#e74c3c', fontWeight: 'bold' }]}>Logout</Text>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Spread the Word</Text>
         <TouchableOpacity
-          style={[styles.settingRow, { backgroundColor: colors.card, borderBottomColor: colors.border, borderBottomWidth: 1, borderTopColor: colors.border, borderTopWidth: 1 }]}
+          style={[styles.settingRow, styles.settingRowBorder, styles.settingRowTopBorder, { backgroundColor: colors.card, borderBottomColor: colors.border, borderTopColor: colors.border }]}
           onPress={handleShareApp}
         >
-          <Text style={[styles.settingText, { color: colors.text }]}>Share Fitness Quest</Text>
-          <Text style={{ fontSize: 18 }}>📤</Text>
+          <Text style={[styles.settingText, { color: colors.text }]}>Share Challenge Fit</Text>
+          <Text style={styles.shareIcon}>📤</Text>
         </TouchableOpacity>
       </View>
 
@@ -123,16 +122,16 @@ export default function SettingsScreen() {
               style={styles.timeRow}
               onPress={() => { setPickerMode('start'); setShowPicker(true); }}
             >
-              <Text style={{ color: colors.text }}>Start Time</Text>
-              <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{formatTime(startTime)}</Text>
+              <Text style={[styles.settingText, { color: colors.text }]}>Start Time</Text>
+              <Text style={[styles.boldText, { color: colors.primary }]}>{formatTime(startTime)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.timeRow}
               onPress={() => { setPickerMode('end'); setShowPicker(true); }}
             >
-              <Text style={{ color: colors.text }}>End Time</Text>
-              <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{formatTime(endTime)}</Text>
+              <Text style={[styles.settingText, { color: colors.text }]}>End Time</Text>
+              <Text style={[styles.boldText, { color: colors.primary }]}>{formatTime(endTime)}</Text>
             </TouchableOpacity>
 
             {showPicker && (
@@ -147,10 +146,10 @@ export default function SettingsScreen() {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity onPress={() => setShowModal(false)} style={styles.cancelBtn}>
-                <Text style={{ color: colors.subtext }}>Cancel</Text>
+                <Text style={[styles.subtext, { color: colors.subtext }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleSaveAvailability} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
-                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Save & Reschedule</Text>
+                <Text style={styles.whiteBoldText}>Save & Reschedule</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -158,7 +157,7 @@ export default function SettingsScreen() {
       </Modal>
 
       <View style={styles.footer}>
-        <Text style={{ color: colors.subtext, fontSize: 12 }}>Fitness Quest v1.0.1</Text>
+        <Text style={[styles.footerText, { color: colors.subtext }]}>Challenge Fit v1.0.1</Text>
       </View>
     </View>
   );
