@@ -11,6 +11,13 @@ yarn-error.log*
 dist/
 web-build/
 
+# Native Builds
+client/android/
+client/ios/
+builds/
+*.apk
+*.aab
+
 # IDEs
 .idea/
 .vscode/
