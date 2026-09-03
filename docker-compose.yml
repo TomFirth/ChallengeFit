@@ -1,16 +1,21 @@
 services:
   server:
+    container_name: challengefit-server
     build: ./server
-    ports:
-      - "8443:8443"
+    expose:
+      - "3001"
     environment:
-      - PORT=8443
+      - PORT=3001
       - DATABASE_URL=postgresql://user:password@db:5432/challengefit
       - NODE_ENV=production
     depends_on:
       - db
+    networks:
+      - proxy
+      - internal
 
   db:
+    container_name: challengefit-db
     image: postgres:15-alpine
     environment:
       - POSTGRES_USER=user
@@ -18,8 +23,14 @@ services:
       - POSTGRES_DB=challengefit
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
+    networks:
+      - internal
 
 volumes:
   postgres_data:
+
+networks:
+  proxy:
+    external: true
+  internal:
+    driver: bridge

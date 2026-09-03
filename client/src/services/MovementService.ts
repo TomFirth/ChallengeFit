@@ -1,9 +1,10 @@
 import * as SecureStore from 'expo-secure-store';
+import { Config } from '../constants/Config';
 
 export type MovementState = 'STILL' | 'MOVING';
 
 class MovementService {
-  private thresholdMinutes = 40;
+  private thresholdMinutes = Config.STATIONARY_THRESHOLD_MINUTES;
   private state: MovementState = 'STILL';
   private stationarySince: Date = new Date();
   private mockMode = true;

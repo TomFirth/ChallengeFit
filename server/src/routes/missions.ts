@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { MissionService } from '../services/MissionService.js';
 import { GamificationService } from '../services/GamificationService.js';
 import { XPService } from '../services/XPService.js';
+import { Config } from '../constants/Config.js';
 import { feedService } from './social.js';
 import { prisma } from '../services/PrismaClient.js';
 
@@ -59,7 +60,6 @@ router.get('/today', async (req, res) => {
     });
 
     if (dailyMissions.length === 0) {
-      // Clear any missions from previous days that might be hanging around
       await prisma.mission.deleteMany({
         where: { userId, createdAt: { lt: today } }
       });
@@ -183,7 +183,7 @@ router.post('/:id/snooze', async (req, res) => {
 
     const [h, m] = mission.bracketEnd.split(':').map(Number);
     const date = new Date();
-    date.setHours(h || 0, (m || 0) + 15, 0, 0);
+    date.setHours(h || 0, (m || 0) + Config.SNOOZE_MINUTES, 0, 0);
     
     const newEnd = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 
@@ -196,7 +196,7 @@ router.post('/:id/snooze', async (req, res) => {
         }
     });
 
-    res.json({ message: 'Mission snoozed for 15 minutes!' });
+    res.json({ message: `Mission snoozed for ${Config.SNOOZE_MINUTES} minutes!` });
 });
 
 router.post('/:id/validate', async (req, res) => {
@@ -207,8 +207,8 @@ router.post('/:id/validate', async (req, res) => {
     if (!mission) return res.status(404).json({ error: 'Mission not found' });
     if (mission.status === 'COMPLETED') return res.status(400).json({ error: 'Already completed' });
 
-    if (steps < 2000) {
-        return res.status(400).json({ error: 'Physical activity not high enough for auto-validation (need 2000 steps)' });
+    if (steps < Config.STEP_THRESHOLD_PER_MISSION) {
+        return res.status(400).json({ error: `Physical activity not high enough for auto-validation (need ${Config.STEP_THRESHOLD_PER_MISSION} steps)` });
     }
 
     await prisma.mission.update({
@@ -243,8 +243,8 @@ router.post('/bonus', async (req, res) => {
         where: { userId, createdAt: { gte: today } }
     });
 
-    if (dailyMissions.filter(m => m.status === 'COMPLETED').length < 3) {
-        return res.status(400).json({ error: 'Complete your 3 daily missions first!' });
+    if (dailyMissions.filter(m => m.status === 'COMPLETED').length < Config.MAX_DAILY_MISSIONS) {
+        return res.status(400).json({ error: `Complete your ${Config.MAX_DAILY_MISSIONS} daily missions first!` });
     }
 
     const usedExerciseIds = dailyMissions.map(m => m.exerciseId);

@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { Config } from '../constants/Config.js';
 
 interface Exercise {
   id: string;
@@ -24,7 +25,7 @@ export class MissionService {
     const allExercises = await this.loadExercises();
 
     const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
-    const selectedExercises = shuffled.slice(0, 3);
+    const selectedExercises = shuffled.slice(0, Config.MAX_DAILY_MISSIONS);
 
     const startTime = user.startTime || '09:00';
     const endTime = user.endTime || '18:00';
@@ -37,7 +38,7 @@ export class MissionService {
         totalMinutes = 60 * 9; // Fallback
     }
     
-    const bracketSize = Math.floor(totalMinutes / 3);
+    const bracketSize = Math.floor(totalMinutes / Config.MAX_DAILY_MISSIONS);
 
     const missions = selectedExercises.map((ex, index) => {
       const bracketStart = startMinutes + (index * bracketSize);
@@ -69,7 +70,7 @@ export class MissionService {
     // Cooldown logic could be moved to DB, but keeping it in-memory/simulated for now
     const now = new Date();
     const lastRefresh = user.lastRefreshTimestamp ? new Date(user.lastRefreshTimestamp) : new Date(0);
-    const cooldownMs = 12 * 60 * 60 * 1000;
+    const cooldownMs = Config.REFRESH_COOLDOWN_HOURS * 60 * 60 * 1000;
     const elapsed = now.getTime() - lastRefresh.getTime();
 
     if (elapsed < cooldownMs) {

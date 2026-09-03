@@ -39,3 +39,7 @@ Thumbs.db
 # Server/Build output
 server/dist/
 server/prisma/migrations/
+
+# Android signing keys
+*.keystore*
+*.jks

@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
+import { Config } from '../constants/Config';
 
-const STEP_THRESHOLD_PER_MISSION = 2000;
+const STEP_THRESHOLD_PER_MISSION = Config.STEP_THRESHOLD_PER_MISSION;
 
 export interface ActivityReport {
   steps: number;
@@ -40,7 +41,7 @@ class HealthService {
    */
   async wasActiveInRange(start: Date, end: Date): Promise<boolean> {
     const steps = await this.getStepsInRange(start, end);
-    return steps >= STEP_THRESHOLD;
+    return steps >= STEP_THRESHOLD_PER_MISSION;
   }
 
   setMockSteps(count: number) {
