@@ -2,8 +2,6 @@ services:
   server:
     container_name: challengefit-server
     build: ./server
-    ports:
-      - "3001:3001"
     environment:
       - PORT=3001
       - DATABASE_URL=postgresql://user:password@db:5432/challengefit
@@ -12,6 +10,7 @@ services:
       - db
     networks:
       - internal
+      - proxy
 
   db:
     container_name: challengefit-db
@@ -22,8 +21,6 @@ services:
       - POSTGRES_DB=challengefit
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
     networks:
       - internal
 
@@ -33,3 +30,5 @@ volumes:
 networks:
   internal:
     driver: bridge
+  proxy:
+    external: true
