@@ -7,7 +7,11 @@ import { Platform } from 'react-native';
  * For physical devices, use your machine's local IP (e.g., 192.168.x.x).
  */
 const DEV_IP = '192.168.1.207'; // Using host IP for cross-device compatibility
-const API_BASE_URL = `http://${Platform.OS === 'android' ? DEV_IP : 'localhost'}:3000/api`;
+const PROD_URL = 'https://challengefit.beardmachinegames.duckdns.org/api';
+
+const API_BASE_URL = __DEV__
+  ? `http://${Platform.OS === 'android' ? DEV_IP : 'localhost'}:3001/api`
+  : PROD_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

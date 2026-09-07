@@ -53,7 +53,7 @@ Run the deployment script on your Raspberry Pi:
 ```
 
 ### 2. Configuration
-- **Port**: The server is exposed on port **8443**.
+- **Port**: The server is exposed on port **3001** (proxied via Caddy in production).
 - **Database**: A PostgreSQL instance is automatically created and managed by Docker.
 
 ---

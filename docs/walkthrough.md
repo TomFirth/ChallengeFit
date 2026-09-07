@@ -21,8 +21,15 @@ Once you've crushed your daily goal, you can now take on extra challenges.
 - **XP Reward**: Completing bonus missions awards extra XP toward your level.
 - **File**: [missions.ts](file:///home/tom/Code/ChallengeFit/server/src/routes/missions.ts)
 
+### 🔌 Port Synchronization
+- **Standardization**: Updated both local and production environments to use port **3001**.
+- **Cross-Device**: The server now explicitly binds to `0.0.0.0` on port 3001, making it accessible from your phone.
+
 ## Verification Results
 - **Tier Logic**: Verified that mocking 4500 steps automatically validates exactly 2 missions.
 - **Success Messaging**: Verified the dynamic message: *"You completed X steps today - all exercises completed! Well done! 🎉"*
 - **Bonus Flow**: Confirmed that the bonus button only appears when the 3-mission goal is met and correctly fetches a new exercise.
 - **Hike Simulator**: Updated the "Simulate Hike" button to mock **6000 steps**, allowing you to see the full "auto-completion" flow instantly.
+
+## 🐋 Note on Docker Usage
+If you encounter a `ModuleNotFoundError: No module named 'distutils'` when running Docker commands, please use **`docker compose`** (with a space) instead of `docker-compose` (with a hyphen). The space-based command is the modern, built-in version and avoids Python-related dependency issues.

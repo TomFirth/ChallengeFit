@@ -35,9 +35,15 @@ router.post('/register', async (req, res) => {
 
     const token = generateToken(user);
     res.json({ token, user });
-  } catch (err) {
-    console.error('[Auth] Registration error:', err);
-    res.status(500).json({ error: 'Failed to register' });
+  } catch (err: any) {
+    console.error('[Auth] Registration error details:', {
+        message: err.message,
+        stack: err.stack,
+        code: err.code,
+        meta: err.meta,
+        payload: { username, email, password: '***' }
+    });
+    res.status(500).json({ error: 'Failed to register', details: err.message });
   }
 });
 

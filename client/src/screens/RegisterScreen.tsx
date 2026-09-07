@@ -3,6 +3,8 @@ import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvo
 import { styles } from '../styles/RegisterScreenStyles';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import api from '../services/api';
 import Toast from 'react-native-toast-message';
 
@@ -30,6 +32,24 @@ export default function RegisterScreen({ navigation }: any) {
       Toast.show({ type: 'error', text1: 'Error', text2: msg });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    const authUrl = `${api.defaults.baseURL}/auth/${provider}`;
+    try {
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, 'challengefit://auth');
+      if (result.type === 'success' && result.url) {
+        const { queryParams } = Linking.parse(result.url);
+        if (queryParams?.token) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${queryParams.token}`;
+          const profile = await api.get('/auth/me');
+          await login(queryParams.token as string, profile.data);
+        }
+      }
+    } catch (error) {
+      console.error(`${provider} login error:`, error);
+      Toast.show({ type: 'error', text1: 'Social Login Failed' });
     }
   };
 
@@ -76,6 +96,25 @@ export default function RegisterScreen({ navigation }: any) {
 
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Text style={[styles.switchText, { color: colors.secondary }]}>Already have an account? Login</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.socialSection}>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <Text style={[styles.orText, { color: colors.subtext, backgroundColor: colors.background }]}>OR</Text>
+
+            <TouchableOpacity
+              style={[styles.socialBtn, styles.socialBtnGoogle]}
+              onPress={() => handleSocialLogin('google')}
+            >
+              <Text style={styles.socialBtnText}>Login with Google</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.socialBtn, styles.socialBtnFacebook]}
+              onPress={() => handleSocialLogin('facebook')}
+            >
+              <Text style={styles.socialBtnText}>Login with Facebook</Text>
             </TouchableOpacity>
           </View>
         </View>

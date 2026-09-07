@@ -31,6 +31,6 @@ The following permissions are now configured in `app.json`:
 
 ## 🚀 Deployment Instructions
 To finalize the migration:
-1. Start your database: `docker-compose up -d db`
+1. Start your database: `docker compose up -d db`
 2. Run Prisma migrations: `npx prisma migrate dev`
 3. Run the data migration script: `tsx src/scripts/migrate_json_to_db.ts`
