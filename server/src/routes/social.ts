@@ -42,9 +42,7 @@ router.get('/groups/:id/leaderboard', async (req, res) => {
     const periodXP = await xpService.getXPForUser(user.id, startDate);
 
     let displayXP = periodXP;
-    if (user.id !== userId && periodXP === 0) {
-        displayXP = Math.floor(Math.random() * 200);
-    }
+    
 
     return {
       ...user,
@@ -56,8 +54,10 @@ router.get('/groups/:id/leaderboard', async (req, res) => {
   res.json(leaderboard);
 });
 
-router.get('/feed', (req, res) => {
-  res.json(feedService.getFeed(['u2', 'u3']));
+router.get('/feed', async (req, res) => {
+  const userId = (req.user as any).id;
+  const feed = await feedService.getFeed(userId);
+  res.json(feed);
 });
 
 router.get('/leaderboard', async (req, res) => {

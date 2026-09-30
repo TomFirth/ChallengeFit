@@ -7,7 +7,6 @@ class MovementService {
   private thresholdMinutes = Config.STATIONARY_THRESHOLD_MINUTES;
   private state: MovementState = 'STILL';
   private stationarySince: Date = new Date();
-  private mockMode = true;
 
   constructor() {
     this.loadState();
@@ -32,6 +31,8 @@ class MovementService {
       this.stationarySince = new Date();
       await SecureStore.setItemAsync('movement_stationary_since', this.stationarySince.toISOString());
     } else if (newState === 'MOVING') {
+        // Reset timer when moving
+        this.stationarySince = new Date();
     }
   }
 
@@ -40,19 +41,14 @@ class MovementService {
   }
 
   getStationaryMinutes(): number {
-    if (this.state === 'MOVING') return 0;
     const now = new Date();
     const diffMs = now.getTime() - this.stationarySince.getTime();
     return Math.floor(diffMs / (1000 * 60));
   }
 
   isAvailableForMission(): boolean {
-    return this.state === 'STILL' && this.getStationaryMinutes() >= this.thresholdMinutes;
-  }
-
-  setMockStationarySince(minutesAgo: number) {
-    this.stationarySince = new Date(Date.now() - minutesAgo * 60 * 1000);
-    this.state = 'STILL';
+    // Alert if stationary for too long
+    return this.getStationaryMinutes() >= this.thresholdMinutes;
   }
 }
 

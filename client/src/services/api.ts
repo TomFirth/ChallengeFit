@@ -1,16 +1,19 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-/**
- * For Android Emulators, 'localhost' refers to the device itself.
- * We must use '10.0.2.2' to refer to the host machine.
- * For physical devices, use your machine's local IP (e.g., 192.168.x.x).
- */
-const DEV_IP = '192.168.1.207'; // Using host IP for cross-device compatibility
 const PROD_URL = 'https://challengefit.beardmachinegames.duckdns.org/api';
 
+// Dynamically extract the Metro host IP (e.g. 192.168.x.x or 10.0.2.2 for emulator)
+const debuggerHost = Constants.expoConfig?.hostUri;
+const devHost = debuggerHost
+  ? debuggerHost.split(':')[0]
+  : Platform.OS === 'android'
+  ? '10.0.2.2'
+  : 'localhost';
+
 const API_BASE_URL = __DEV__
-  ? `http://${Platform.OS === 'android' ? DEV_IP : 'localhost'}:3001/api`
+  ? `http://${devHost}:3001/api`
   : PROD_URL;
 
 const api = axios.create({

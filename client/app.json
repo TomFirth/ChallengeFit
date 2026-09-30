@@ -3,7 +3,7 @@
     "name": "Challenge Fit",
     "slug": "challenge-fit",
     "scheme": "challengefit",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,8 @@
         "NSLocationWhenInUseUsageDescription": "Challenge Fit needs location to track your activity.",
         "NSMotionUsageDescription": "Challenge Fit uses motion data to detect when you are stationary for long periods.",
         "NSHealthUpdateUsageDescription": "Challenge Fit needs to read your activity data to automatically validate missions if you were active during their time window.",
-        "NSHealthShareUsageDescription": "Challenge Fit uses your activity data to help you complete fitness missions automatically."
+        "NSHealthShareUsageDescription": "Challenge Fit uses your activity data to help you complete fitness missions automatically.",
+        "NSContactsUsageDescription": "Challenge Fit needs access to your contacts to help you find and invite friends to your exercise groups."
       },
       "bundleIdentifier": "com.beardmachinegames.challengefit"
     },
@@ -37,7 +38,13 @@
         "ACCESS_BACKGROUND_LOCATION",
         "ACTIVITY_RECOGNITION",
         "POST_NOTIFICATIONS",
-        "android.permission.health.READ_STEPS"
+        "android.permission.health.READ_STEPS",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_HEALTH",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "READ_CONTACTS"
       ],
       "package": "com.beardmachinegames.challengefit"
     },
@@ -46,7 +53,13 @@
     },
     "plugins": [
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Challenge Fit to use your location."
+        }
+      ]
     ]
   }
 }

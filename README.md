@@ -12,18 +12,20 @@ A gamified exercise app built with React Native (Expo) and Node.js (Express).
 ### 1. First-Time Setup (Database)
 The app requires a PostgreSQL database. We use Docker to manage this easily.
 
-1.  Start the database container:
+1.  Ensure Docker network exists and start the DB:
     ```bash
+    docker network create proxy 2>/dev/null || true
     docker compose up -d db
     ```
 2.  Configure your environment:
-    - Create/Update `server/.env` and set:
-      `DATABASE_URL="postgresql://user:password@localhost:5555/challengefit"`
+    - Copy `server/.env.example` to `server/.env` (default DB URL: `postgresql://user:password@localhost:5432/challengefit`).
 3.  Initialize the database schema:
     ```bash
     cd server
-    npx prisma migrate dev --name init
+    npx prisma db push
     ```
+
+> 💡 **Need to reset/clean local database?** See [`docs/development.md`](docs/development.md) for step-by-step instructions.
 
 ### 2. Start the Backend
 ```bash
@@ -72,9 +74,9 @@ Run the deployment script on your Raspberry Pi:
 - Milestones: *Early Bird* and *Clutch*.
 
 ### Social
-- Real-time **Nudges** using Socket.io.
-- Friend Feed of activity events.
+- Friend Feed of real-time activity events.
 - Global and Friend Leaderboards.
+- Group-based competitive rankings.
 
 ### Settings
 - Dark/Light mode support.

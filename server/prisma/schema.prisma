@@ -39,7 +39,7 @@ model Group {
 
 model Mission {
   id                 String   @id @default(uuid())
-  user               User     @relation(fields: [userId], references: [id])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId             String
   exerciseId         String
   scheduledTime      DateTime
@@ -54,7 +54,7 @@ model Mission {
 
 model XPLog {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   amount    Int
   timestamp DateTime @default(now())

@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   const handleShareApp = async () => {
     try {
       await Share.share({
-        message: 'Join me on Challenge Fit and start your gamified exercise journey! 🎯\nDownload it here: https://challengefit.app/download',
+        message: 'Join me on Challenge Fit and start your gamified exercise journey! \nDownload it here: https://challengefit.app/download',
         title: 'Challenge Fit',
       });
     } catch (e) {
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
           onPress={handleShareApp}
         >
           <Text style={[styles.settingText, { color: colors.text }]}>Share Challenge Fit</Text>
-          <Text style={styles.shareIcon}>📤</Text>
+          <Text style={styles.shareIcon}></Text>
         </TouchableOpacity>
       </View>
 

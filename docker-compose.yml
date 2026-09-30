@@ -2,6 +2,8 @@ services:
   server:
     container_name: challengefit-server
     build: ./server
+    ports:
+      - "3001:3001"
     environment:
       - PORT=3001
       - DATABASE_URL=postgresql://user:password@db:5432/challengefit
@@ -15,6 +17,8 @@ services:
   db:
     container_name: challengefit-db
     image: postgres:15-alpine
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password

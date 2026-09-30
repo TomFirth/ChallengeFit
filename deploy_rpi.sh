@@ -14,15 +14,16 @@ echo "📦 Transferring configuration and source code..."
 rsync -avz --mkpath \
     --exclude 'node_modules' \
     --exclude 'client' \
+    --exclude 'builds' \
     --exclude '.git' \
     --exclude '.idea' \
     --exclude 'data' \
     --exclude 'server/prisma/migrations' \
     ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
-# 2. Build and restart containers on the RPi (prompts for password a second time)
+# 2. Ensure proxy network exists and restart containers on RPi
 echo "🏗️  Starting containers on RPi..."
-ssh $REMOTE_USER@$REMOTE_HOST "cd $REMOTE_DIR && docker compose up -d --build"
+ssh $REMOTE_USER@$REMOTE_HOST "docker network create proxy 2>/dev/null || true; cd $REMOTE_DIR && docker compose up -d --build"
 
 echo "✅ Deployment complete. Server running on port 3001."
 

@@ -39,15 +39,25 @@ graph TD
 
 ### 3.3 Rewards & Gamification (Phase 8)
 *   **Tiered XP Rewards**:
-    *   **Steps**: 1 XP per physical step recorded.
-    *   **Goal Completion**: 2 XP per mission completed (including via steps).
-    *   **Active Response**: 3 XP per mission completed immediately upon notification.
+    *   **Steps**: 5 XP per 2,000 steps used to complete a mission.
+    *   **Manual Completion**: 7 XP per mission completed.
+    *   **Active Response**: 10 XP per mission completed "On-Time".
+    *   **Extra Mission**: 3 XP per bonus mission.
+*   **Level Progression**:
+    *   Formula follows a geometric progression ($3^n \times 11$):
+        *   Level 1: 33 XP
+        *   Level 2: 99 XP
+        *   Level 3: 297 XP
+        *   Level 4: 891 XP
+        *   The progression is infinite and calculated on-the-fly based on total XP.
 *   **Streaks**:
     *   **Daily Streak**: Increments if at least 1 mission is completed per day.
+    *   **XP Bonus**: Users receive a daily bonus equal to their current streak count (e.g., 7-day streak = +7 XP bonus for that day).
     *   **Streak Reset**: If ALL 3 missions in a day are `MISSED`, Current Streak resets to 0.
 
 ### 3.4 Social & Community
 *   **Groups**: Create/Join private groups for competitive leaderboards.
+*   **Contact Integration**: Access device contacts to easily find and invite friends to groups.
 *   **Group Leaderboards**: Ranks based on XP earned *since the group's creation*.
 *   **Sharing**: Share group status and app invitations via native system share sheet.
 

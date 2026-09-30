@@ -43,8 +43,8 @@ export default function SocialScreen() {
           <Text style={[styles.eventText, { color: colors.text }]}>
             <Text style={styles.username}>{item.username}</Text>
             {isMilestone
-              ? ` reached a ${item.data.streak} day streak! 🔥`
-              : ` completed ${item.data.exercise}! 💪`}
+              ? ` reached a ${item.data.streak} day streak! `
+              : ` completed ${item.data.exercise}! `}
           </Text>
           <Text style={[styles.time, { color: colors.subtext }]}>{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
         </View>

@@ -116,7 +116,6 @@ router.post('/:id/complete', async (req, res) => {
 
   if (!mission) return res.status(404).json({ error: 'Mission not found' });
   if (mission.status === 'COMPLETED') return res.status(400).json({ error: 'Mission already completed' });
-  if (mission.status === 'MISSED') return res.status(400).json({ error: 'Mission already missed' });
 
   if (!isFlexMode) {
     const now = new Date();
@@ -144,19 +143,56 @@ router.post('/:id/complete', async (req, res) => {
   });
 
   const completedTodayCount = dailyMissions.filter(m => m.status === 'COMPLETED').length;
-  const xpEarned = gamificationService.calculateXP(completedTodayCount, user.daysActive || 1, user.currentStreak);
 
-  const updatedUser = await prisma.user.update({
+  const now = new Date();
+  const [h, m] = mission.bracketStart.split(':').map(Number);
+  const bracketStart = new Date();
+  bracketStart.setHours(h || 0, m || 0, 0, 0);
+
+  const diffMins = (now.getTime() - bracketStart.getTime()) / (1000 * 60);
+  const isOnTime = diffMins >= 0 && diffMins <= Config.ON_TIME_THRESHOLD_MINUTES;
+
+  let xpEarned = isOnTime ? Config.XP_PER_MISSION_ON_TIME : Config.XP_PER_MISSION_MANUAL;
+
+  if (mission.id.startsWith('bonus-')) {
+      xpEarned = Config.XP_PER_BONUS_MISSION;
+  }
+
+  const isFirstCompletionToday = dailyMissions.filter(m => m.status === 'COMPLETED').length === 1;
+  if (isFirstCompletionToday && user.currentStreak > 0) {
+      xpEarned += user.currentStreak;
+  }
+
+  const actualXpAdded = await xpService.logXP(user.id, xpEarned);
+
+  const nowComp = new Date();
+  const lastDate = user.lastCompletionDate ? new Date(user.lastCompletionDate) : null;
+  let streakUpdate = {};
+
+  if (!lastDate) {
+      streakUpdate = { currentStreak: 1, bestStreak: 1 };
+  } else {
+      const diffDays = Math.floor((nowComp.getTime() - lastDate.getTime()) / (1000 * 3600 * 24));
+      if (diffDays === 1) {
+          const newStreak = user.currentStreak + 1;
+          streakUpdate = {
+              currentStreak: newStreak,
+              bestStreak: Math.max(newStreak, user.bestStreak)
+          };
+      } else if (diffDays > 1) {
+          streakUpdate = { currentStreak: 1 };
+      }
+  }
+
+  await prisma.user.update({
       where: { id: user.id },
       data: {
-          totalXP: user.totalXP + xpEarned,
-          currentLevel: gamificationService.calculateLevel(user.totalXP + xpEarned),
-          lastCompletionDate: new Date(),
-          daysActive: user.daysActive + 1
+          currentLevel: gamificationService.calculateLevel(user.totalXP + actualXpAdded),
+          lastCompletionDate: nowComp,
+          daysActive: user.daysActive + 1,
+          ...streakUpdate
       }
   });
-
-  await xpService.logXP(user.id, xpEarned);
 
   feedService.addEvent(user.id, user.username, 'MISSION_COMPLETED', {
     exercise: mission.exerciseId.replace('-', ' '),
@@ -164,11 +200,13 @@ router.post('/:id/complete', async (req, res) => {
 
   const allCompleted = dailyMissions.every(m => m.status === 'COMPLETED');
 
+  const finalUser = await prisma.user.findUnique({ where: { id: user.id } });
+
   res.json({
-    message: `Mission completed! You earned ${xpEarned} XP!`,
-    xpEarned,
-    newTotalXP: updatedUser.totalXP,
-    newLevel: updatedUser.currentLevel,
+    message: `Mission completed! You earned ${actualXpAdded} XP!`,
+    xpEarned: actualXpAdded,
+    newTotalXP: finalUser?.totalXP,
+    newLevel: finalUser?.currentLevel,
     allCompleted
   });
 });
@@ -208,7 +246,7 @@ router.post('/:id/validate', async (req, res) => {
     if (mission.status === 'COMPLETED') return res.status(400).json({ error: 'Already completed' });
 
     if (steps < Config.STEP_THRESHOLD_PER_MISSION) {
-        return res.status(400).json({ error: `Physical activity not high enough for auto-validation (need ${Config.STEP_THRESHOLD_PER_MISSION} steps)` });
+        return res.status(400).json({ error: `Physical activity not high enough for validation (need ${Config.STEP_THRESHOLD_PER_MISSION} steps)` });
     }
 
     await prisma.mission.update({
@@ -218,18 +256,51 @@ router.post('/:id/validate', async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: mission.userId } });
     if (user) {
-        const xpEarned = 10;
+        const actualXpAdded = await xpService.logXP(user.id, Config.XP_PER_MISSION_STEPS);
         await prisma.user.update({
             where: { id: user.id },
             data: {
-                totalXP: user.totalXP + xpEarned,
-                currentLevel: gamificationService.calculateLevel(user.totalXP + xpEarned),
+                currentLevel: gamificationService.calculateLevel(user.totalXP + actualXpAdded),
             }
         });
-        await xpService.logXP(user.id, xpEarned);
     }
 
-    res.json({ message: 'Mission auto-validated based on physical activity! 💪' });
+    res.json({ message: 'Mission auto-validated based on physical activity!' });
+});
+
+router.post('/:id/refresh', async (req, res) => {
+    const { id } = req.params;
+    const userId = (req.user as any).id;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentMissions = await prisma.mission.findMany({
+        where: { userId, createdAt: { gte: today } }
+    });
+
+    try {
+        const { mission, cooldownRemaining } = await missionService.refreshMission(user, id, currentMissions);
+
+        if (cooldownRemaining) {
+            return res.status(400).json({ error: `Refresh on cooldown. Wait ${cooldownRemaining} more minutes.` });
+        }
+
+        await prisma.mission.update({
+            where: { id: mission.id },
+            data: { exerciseId: mission.exerciseId }
+        });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { lastRefreshTimestamp: new Date() }
+        });
+
+        res.json({ message: 'Mission refreshed successfully', mission });
+    } catch (error: any) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 router.post('/bonus', async (req, res) => {

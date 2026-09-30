@@ -137,6 +137,12 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  missedAlert: {
+      fontSize: 12,
+      fontStyle: 'italic',
+      marginTop: 4,
+      marginBottom: 8,
+  },
   statusBanner: {
       padding: 15,
       paddingHorizontal: 20,
